@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: last-mile-delivery
+  namespace: paklog-core
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: last-mile-delivery
+  template:
+    metadata:
+      labels:
+        app: last-mile-delivery
+    spec:
+      containers:
+      - name: last-mile-delivery
+        image: paklog/last-mile-delivery:latest
+        ports:
+        - containerPort: 8096
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "production"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: last-mile-delivery
+  namespace: paklog-core
+spec:
+  selector:
+    app: last-mile-delivery
+  ports:
+  - port: 8096
+    targetPort: 8096

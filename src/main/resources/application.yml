@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: last-mile-delivery
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/last_mile_delivery}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.cloudevents.kafka.CloudEventSerializer
+    consumer:
+      group-id: last-mile-delivery
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.cloudevents.kafka.CloudEventDeserializer
+
+server:
+  port: 8096
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.paklog.last.mile.delivery: DEBUG
