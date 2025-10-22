@@ -1,23 +1,20 @@
 spring:
   application:
     name: last-mile-delivery
-
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb://localhost:27017/last_mile_delivery}
-
+      uri: ${MONGODB_URI:mongodb://localhost:27017/lastmile}
+      auto-index-creation: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: io.cloudevents.kafka.CloudEventSerializer
-    consumer:
-      group-id: last-mile-delivery
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.cloudevents.kafka.CloudEventDeserializer
 
 server:
-  port: 8096
+  port: ${SERVER_PORT:8096}
 
 management:
   endpoints:
@@ -29,7 +26,35 @@ management:
       prometheus:
         enabled: true
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+delivery:
+  events:
+    topic: lastmile.events
+  optimization:
+    max-stops-per-route: 50
+    max-attempts: 3
+    stop-duration-minutes: 15
+  routing:
+    algorithm: vrp-2opt
+    max-iterations: 100
+
 logging:
   level:
     root: INFO
-    com.paklog.last.mile.delivery: DEBUG
+    com.paklog.lastmile: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    mongodb:
+      uri: mongodb://mongodb:27017/lastmile
+  kafka:
+    bootstrap-servers: kafka:9092
